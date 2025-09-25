@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:soft_electronics/screens/measurement_screen_fixed.dart';
 import '../screens/weekly_report_screen.dart';
+import '../screens/posture_image_test_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -49,48 +50,41 @@ class HomeScreen extends StatelessWidget {
                           ],
                         ),
                         child: Container(
-                          margin: const EdgeInsets.all(8),
+                          margin: const EdgeInsets.all(3),
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: Colors.white,
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.accessibility_new,
-                            color: Color(0xFF4A90E2),
                             size: 60,
+                            color: const Color(0xFF4A90E2),
                           ),
                         ),
                       ),
                       const SizedBox(height: 24),
-                      Text(
-                        '🧘‍♀️ 스마트 자세 케어',
-                        style: TextStyle(
-                          color: const Color(0xFF2D3748),
-                          fontSize: 32,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.5,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 12),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF4A90E2).withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          '올바른 자세로 건강한 하루를 시작하세요',
-                          style: TextStyle(
-                            color: const Color(0xFF4A90E2),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
+                      Column(
+                        children: [
+                          Text(
+                            'Smart Posture',
+                            style: TextStyle(
+                              color: const Color(0xFF2D3748),
+                              fontSize: 32,
+                              fontWeight: FontWeight.w800,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
+                          const SizedBox(height: 8),
+                          Text(
+                            '자세 교정을 위한 스마트 솔루션',
+                            style: TextStyle(
+                              color: const Color(0xFF718096),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -121,7 +115,7 @@ class HomeScreen extends StatelessWidget {
                           );
                         },
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 20),
                       _buildMenuButton(
                         context,
                         title: '📊 주간 리포트',
@@ -136,6 +130,26 @@ class HomeScreen extends StatelessWidget {
                             context,
                             MaterialPageRoute(
                               builder: (context) => const WeeklyReportScreen(),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      _buildMenuButton(
+                        context,
+                        title: '📸 포스처 이미지 뷰어',
+                        subtitle: '직관적인 아이콘으로 자세 확인',
+                        icon: Icons.photo_camera,
+                        gradient: [
+                          const Color(0xFF8B5CF6),
+                          const Color(0xFF7C3AED),
+                        ],
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder:
+                                  (context) => const PostureImageTestScreen(),
                             ),
                           );
                         },
@@ -241,16 +255,19 @@ class HomeScreen extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  width: 60,
-                  height: 60,
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(colors: gradient),
+                    borderRadius: BorderRadius.circular(16),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: gradient,
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: gradient[0].withOpacity(0.3),
                         blurRadius: 12,
-                        spreadRadius: 2,
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
@@ -264,27 +281,34 @@ class HomeScreen extends StatelessWidget {
                       Text(
                         title,
                         style: TextStyle(
-                          color: Colors.white,
+                          color: const Color(0xFF2D3748),
                           fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         subtitle,
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
+                          color: const Color(0xFF718096),
                           fontSize: 14,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
                   ),
                 ),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  color: Colors.white.withOpacity(0.6),
-                  size: 16,
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: gradient[0].withOpacity(0.1),
+                  ),
+                  child: Icon(
+                    Icons.arrow_forward_ios,
+                    color: gradient[0],
+                    size: 16,
+                  ),
                 ),
               ],
             ),

@@ -4,6 +4,20 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:async';
 import 'dart:convert';
+import '../widgets/posture_image_viewer.dart';
+import 'posture_test_screen.dart';
+
+// 자세 이름 매핑 (전역 상수)
+const Map<int, String> postureNames = {
+  0: '바른 자세',
+  1: '거북목 자세',
+  2: '목 숙이기',
+  3: '앞으로 당겨 기대기',
+  4: '오른쪽으로 기대기',
+  5: '왼쪽으로 기대기',
+  6: '오른쪽 다리 꼬기',
+  7: '왼쪽 다리 꼬기',
+};
 
 class MeasurementScreenFixed extends StatefulWidget {
   const MeasurementScreenFixed({super.key});
@@ -65,6 +79,25 @@ class _MeasurementScreenFixedState extends State<MeasurementScreenFixed>
 
   // 연결 상태 확인 헬퍼 함수
   bool get _isConnected => _imuDevice != null || _fsrDevice != null;
+
+  // 현재 자세에서 자세 번호 추출
+  int? _extractPostureNumber() {
+    if (_currentPosture.isEmpty) return null;
+
+    // "0번 자세", "1번 자세" 등의 패턴에서 번호 추출
+    RegExp regExp = RegExp(r'(\d+)번\s*자세');
+    Match? match = regExp.firstMatch(_currentPosture);
+
+    if (match != null) {
+      int postureNumber = int.parse(match.group(1)!);
+      // 0~7 범위 내의 자세 번호만 반환
+      if (postureNumber >= 0 && postureNumber <= 7) {
+        return postureNumber;
+      }
+    }
+
+    return null;
+  }
 
   // 연결 상태 텍스트 반환 함수
   String _getConnectionStatusText() {
@@ -318,14 +351,15 @@ class _MeasurementScreenFixedState extends State<MeasurementScreenFixed>
 
     try {
       // 기기 이름을 기반으로 모듈 타입 자동 판별
-      String deviceName = device.platformName.isNotEmpty 
-          ? device.platformName 
-          : device.remoteId.str;
+      String deviceName =
+          device.platformName.isNotEmpty
+              ? device.platformName
+              : device.remoteId.str;
       String deviceNameUpper = deviceName.toUpperCase();
-      
+
       bool connectAsIMU = false;
       bool connectAsFSR = false;
-      
+
       // 1. 기기 이름에 따른 자동 판별
       if (deviceNameUpper.contains('IMU')) {
         connectAsIMU = (_imuDevice == null);
@@ -349,7 +383,7 @@ class _MeasurementScreenFixedState extends State<MeasurementScreenFixed>
         // 2. 기기 이름으로 판별할 수 없는 경우 빈 슬롯에 순서대로 연결
         connectAsIMU = (_imuDevice == null);
         connectAsFSR = (_fsrDevice == null && !connectAsIMU);
-        
+
         if (!connectAsIMU && !connectAsFSR) {
           setState(() {
             _isConnecting = false;
@@ -361,8 +395,12 @@ class _MeasurementScreenFixedState extends State<MeasurementScreenFixed>
 
       String moduleType = connectAsIMU ? "IMU" : "FSR";
       print('🔍 기기 이름 분석: "$deviceName" -> 타입: $moduleType');
-      print('📞 $moduleType 모듈로 장치 연결 시도: ${device.platformName} (${device.remoteId})');
-      print('📊 현재 연결 상태 - IMU: ${_imuDevice?.platformName ?? "연결안됨"}, FSR: ${_fsrDevice?.platformName ?? "연결안됨"}');
+      print(
+        '📞 $moduleType 모듈로 장치 연결 시도: ${device.platformName} (${device.remoteId})',
+      );
+      print(
+        '📊 현재 연결 상태 - IMU: ${_imuDevice?.platformName ?? "연결안됨"}, FSR: ${_fsrDevice?.platformName ?? "연결안됨"}',
+      );
       print('📞 장치 연결 시도: ${device.platformName} (${device.remoteId})');
       await device.connect(timeout: Duration(seconds: 10));
       print('✅ 기기에 연결됨: ${device.platformName}');
@@ -1286,7 +1324,29 @@ class _MeasurementScreenFixedState extends State<MeasurementScreenFixed>
                         textAlign: TextAlign.center,
                       ),
                     ),
-                    Container(width: 48),
+                    // 3D 테스트 모드 버튼
+                    Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF48BB78).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const PostureTestScreen(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(
+                          Icons.view_in_ar,
+                          color: Color(0xFF48BB78),
+                          size: 20,
+                        ),
+                        tooltip: '3D 자세 테스트 모드',
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -1981,6 +2041,36 @@ class _MeasurementScreenFixedState extends State<MeasurementScreenFixed>
                             ],
                           )
                         else ...[
+                          // 3D 자세 모델 표시 (자세 번호가 있을 때만)
+                          if (_extractPostureNumber() != null) ...[
+                            Container(
+                              width: 120,
+                              height: 120,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: currentColor.withOpacity(0.2),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: PostureImageViewer(
+                                  postureIndex: _extractPostureNumber()!,
+                                  width: 120,
+                                  height: 150,
+                                  showLabel: false,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                          ],
+
+                          // 자세 텍스트 표시
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 20,
@@ -1994,7 +2084,7 @@ class _MeasurementScreenFixedState extends State<MeasurementScreenFixed>
                               _currentPosture,
                               style: TextStyle(
                                 color: currentColor,
-                                fontSize: 24,
+                                fontSize: 20,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: -0.5,
                               ),
@@ -2003,12 +2093,12 @@ class _MeasurementScreenFixedState extends State<MeasurementScreenFixed>
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 8),
                           Text(
                             '${_confidence.toInt()}%',
                             style: TextStyle(
                               color: currentColor,
-                              fontSize: 28,
+                              fontSize: 24,
                               fontWeight: FontWeight.w600,
                               letterSpacing: -1.0,
                             ),
