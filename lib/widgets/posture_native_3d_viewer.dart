@@ -337,16 +337,18 @@ class ObjModelPainter extends CustomPainter {
     print('🎨 렌더링 시작: ${vertices.length}개 정점, ${faces.length}개 면');
 
     // 더 강한 색상과 더 굵은 선으로 확실히 보이도록
-    final Paint paint = Paint()
-      ..color = _getPostureColor()
-      ..style = PaintingStyle.fill
-      ..isAntiAlias = true;
+    final Paint paint =
+        Paint()
+          ..color = _getPostureColor()
+          ..style = PaintingStyle.fill
+          ..isAntiAlias = true;
 
-    final Paint strokePaint = Paint()
-      ..color = Colors.black
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0
-      ..isAntiAlias = true;
+    final Paint strokePaint =
+        Paint()
+          ..color = Colors.black
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.0
+          ..isAntiAlias = true;
 
     // 모델의 경계 박스 계산
     double minX = vertices.isNotEmpty ? vertices[0].x : 0;
@@ -421,7 +423,10 @@ class ObjModelPainter extends CustomPainter {
           path.moveTo(projectedPoints[face[0]].dx, projectedPoints[face[0]].dy);
 
           for (int i = 1; i < face.length; i++) {
-            path.lineTo(projectedPoints[face[i]].dx, projectedPoints[face[i]].dy);
+            path.lineTo(
+              projectedPoints[face[i]].dx,
+              projectedPoints[face[i]].dy,
+            );
           }
 
           path.close();

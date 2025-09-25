@@ -22,7 +22,9 @@ class _GLBPostureTestScreenState extends State<GLBPostureTestScreen> {
         foregroundColor: Colors.white,
         actions: [
           IconButton(
-            icon: Icon(enableInteraction ? Icons.pan_tool : Icons.pan_tool_outlined),
+            icon: Icon(
+              enableInteraction ? Icons.pan_tool : Icons.pan_tool_outlined,
+            ),
             onPressed: () {
               setState(() {
                 enableInteraction = !enableInteraction;
@@ -69,26 +71,17 @@ class _GLBPostureTestScreenState extends State<GLBPostureTestScreen> {
               ],
             ),
           ),
-          
+
           // 3D 모델 뷰어
           Expanded(
             flex: 2,
             child: Container(
               width: double.infinity,
-              margin: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
-              ),
+              margin: const EdgeInsets.all(8),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(0),
                 child: PostureModelViewer(
+                  key: ValueKey(selectedPosture),
                   postureNumber: selectedPosture,
                   width: double.infinity,
                   height: double.infinity,
@@ -98,7 +91,7 @@ class _GLBPostureTestScreenState extends State<GLBPostureTestScreen> {
               ),
             ),
           ),
-          
+
           // 포스처 선택 그리드
           Expanded(
             flex: 1,
@@ -118,12 +111,13 @@ class _GLBPostureTestScreenState extends State<GLBPostureTestScreen> {
                   const SizedBox(height: 12),
                   Expanded(
                     child: GridView.builder(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 4,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                        childAspectRatio: 1.2,
-                      ),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 4,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                            childAspectRatio: 1.2,
+                          ),
                       itemCount: 8,
                       itemBuilder: (context, index) {
                         final isSelected = index == selectedPosture;
@@ -140,18 +134,24 @@ class _GLBPostureTestScreenState extends State<GLBPostureTestScreen> {
                             child: Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                gradient: isSelected
-                                    ? const LinearGradient(
-                                        colors: [Color(0xFF6366F1), Color(0xFF8B5CF6)],
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                      )
-                                    : null,
-                                color: isSelected ? null : const Color(0xFFF8FAFC),
+                                gradient:
+                                    isSelected
+                                        ? const LinearGradient(
+                                          colors: [
+                                            Color(0xFF6366F1),
+                                            Color(0xFF8B5CF6),
+                                          ],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        )
+                                        : null,
+                                color:
+                                    isSelected ? null : const Color(0xFFF8FAFC),
                                 border: Border.all(
-                                  color: isSelected
-                                      ? Colors.transparent
-                                      : const Color(0xFFE2E8F0),
+                                  color:
+                                      isSelected
+                                          ? Colors.transparent
+                                          : const Color(0xFFE2E8F0),
                                   width: 1,
                                 ),
                               ),
@@ -163,9 +163,10 @@ class _GLBPostureTestScreenState extends State<GLBPostureTestScreen> {
                                     style: TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.bold,
-                                      color: isSelected
-                                          ? Colors.white
-                                          : const Color(0xFF6366F1),
+                                      color:
+                                          isSelected
+                                              ? Colors.white
+                                              : const Color(0xFF6366F1),
                                     ),
                                   ),
                                   const SizedBox(height: 4),
@@ -173,9 +174,10 @@ class _GLBPostureTestScreenState extends State<GLBPostureTestScreen> {
                                     '${index}번 자세',
                                     style: TextStyle(
                                       fontSize: 11,
-                                      color: isSelected
-                                          ? Colors.white70
-                                          : const Color(0xFF64748B),
+                                      color:
+                                          isSelected
+                                              ? Colors.white70
+                                              : const Color(0xFF64748B),
                                     ),
                                   ),
                                 ],
@@ -192,7 +194,7 @@ class _GLBPostureTestScreenState extends State<GLBPostureTestScreen> {
           ),
         ],
       ),
-      
+
       // 성능 정보 플로팅 버튼
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
@@ -211,39 +213,43 @@ class _GLBPostureTestScreenState extends State<GLBPostureTestScreen> {
   void _showPerformanceInfo(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.speed, color: Color(0xFF10B981)),
-            SizedBox(width: 8),
-            Text('GLB vs OBJ 성능 비교'),
-          ],
-        ),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('📊 파일 크기 비교:', style: TextStyle(fontWeight: FontWeight.bold)),
-            Text('• OBJ: ~7MB → GLB: ~2.7MB (60% 압축)'),
-            SizedBox(height: 12),
-            Text('⚡ 성능 개선:', style: TextStyle(fontWeight: FontWeight.bold)),
-            Text('• 로딩 속도: 3-5초 → 0.5-1초'),
-            Text('• 렌더링: CPU → WebGL 하드웨어 가속'),
-            Text('• 메모리: 500MB → 100-200MB'),
-            SizedBox(height: 12),
-            Text('✨ 품질 개선:', style: TextStyle(fontWeight: FontWeight.bold)),
-            Text('• 실시간 조명 및 그림자'),
-            Text('• 부드러운 터치 인터랙션'),
-            Text('• 자동 중앙정렬 및 최적화'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('확인'),
+      builder:
+          (context) => AlertDialog(
+            title: const Row(
+              children: [
+                Icon(Icons.speed, color: Color(0xFF10B981)),
+                SizedBox(width: 8),
+                Text('GLB vs OBJ 성능 비교'),
+              ],
+            ),
+            content: const Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '📊 파일 크기 비교:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text('• OBJ: ~7MB → GLB: ~2.7MB (60% 압축)'),
+                SizedBox(height: 12),
+                Text('⚡ 성능 개선:', style: TextStyle(fontWeight: FontWeight.bold)),
+                Text('• 로딩 속도: 3-5초 → 0.5-1초'),
+                Text('• 렌더링: CPU → WebGL 하드웨어 가속'),
+                Text('• 메모리: 500MB → 100-200MB'),
+                SizedBox(height: 12),
+                Text('✨ 품질 개선:', style: TextStyle(fontWeight: FontWeight.bold)),
+                Text('• 실시간 조명 및 그림자'),
+                Text('• 부드러운 터치 인터랙션'),
+                Text('• 자동 중앙정렬 및 최적화'),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('확인'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 }

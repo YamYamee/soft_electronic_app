@@ -1,19 +1,24 @@
 # OBJ to GLB 변환 가이드
 
 ## 🎯 목표
-현재 7MB OBJ 파일들 → 1-3MB GLB 파일들로 변환하여 
+
+현재 7MB OBJ 파일들 → 1-3MB GLB 파일들로 변환하여
+
 - 로딩 속도 10배 개선
-- 메모리 사용량 50% 감소  
+- 메모리 사용량 50% 감소
 - 부드러운 하드웨어 가속 렌더링
 
 ## 🔧 변환 방법
 
 ### 방법 1: 온라인 변환 (추천)
-1. **Facebook/Meta 3D Posts** 
+
+1. **Facebook/Meta 3D Posts**
+
    - https://www.facebook.com/3dposts/
    - OBJ 업로드 → GLB 다운로드
 
 2. **GitHub glTF-Validator**
+
    - https://github.khronos.org/glTF-Validator/
    - 드래그&드롭으로 간단 변환
 
@@ -22,7 +27,9 @@
    - 무료 계정으로 변환 가능
 
 ### 방법 2: 로컬 도구 설치
+
 1. **Blender** (무료, 강력)
+
    ```
    1. Blender 설치 (https://www.blender.org/)
    2. File → Import → Wavefront (.obj)
@@ -37,6 +44,7 @@
    ```
 
 ### 방법 3: Python 스크립트
+
 ```python
 # pip install pymeshlab
 import pymeshlab
@@ -52,12 +60,14 @@ for i in range(8):
 ```
 
 ## 📊 예상 결과
+
 - **파일 크기**: 7MB → 1-3MB (50-85% 압축)
 - **로딩 속도**: 3-5초 → 0.5-1초
 - **렌더링**: 버벅거림 → 60fps 부드러움
 - **메모리**: 500MB → 100-200MB
 
 ## 🚀 변환 후 사용법
+
 ```dart
 // GLB 파일을 Model Viewer에서 사용
 ModelViewer(
@@ -69,6 +79,7 @@ ModelViewer(
 ```
 
 ## 📋 체크리스트
+
 - [ ] 변환 도구 선택 (Blender 추천)
 - [ ] 8개 OBJ 파일 → GLB 변환
 - [ ] pubspec.yaml assets 경로 업데이트

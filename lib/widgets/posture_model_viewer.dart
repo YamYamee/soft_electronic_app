@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 
 /// 고품질 Model Viewer를 사용한 3D 포스처 뷰어
-/// 
+///
 /// 주요 특징:
 /// - WebGL 하드웨어 가속 렌더링
 /// - 부드러운 터치 인터랙션 (회전, 줌, 팬)
@@ -34,11 +34,19 @@ class _PostureModelViewerState extends State<PostureModelViewer> {
   bool isLoading = true;
   String? errorMessage;
   String? modelPath;
-  
+
   @override
   void initState() {
     super.initState();
     _loadModel();
+  }
+
+  @override
+  void didUpdateWidget(PostureModelViewer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.postureNumber != widget.postureNumber) {
+      _loadModel();
+    }
   }
 
   Future<void> _loadModel() async {
@@ -49,29 +57,31 @@ class _PostureModelViewerState extends State<PostureModelViewer> {
       });
 
       // GLB 파일 경로 (OBJ에서 변환된 파일)
-      final glbPath = 'postures/${widget.postureNumber}번자세.glb';
-      
+      final glbPath = 'postures/posture_${widget.postureNumber}.glb';
+
+      // GLB 파일 로드 시도
+
       // GLB 파일 존재 확인
       try {
-        final data = await rootBundle.load(glbPath);
-        print('📊 GLB 파일 로드 성공: ${data.lengthInBytes} bytes');
-        
+        await rootBundle.load(glbPath);
+        // GLB 파일 로드 성공
+
         setState(() {
           modelPath = glbPath;
           isLoading = false;
         });
       } catch (e) {
         // GLB가 없으면 OBJ 파일 시도 (호환성)
-        final objPath = 'postures/${widget.postureNumber}번자세.obj';
+        final objPath = 'postures/posture_${widget.postureNumber}.obj';
         try {
-          final data = await rootBundle.loadString(objPath);
-          print('⚠️  GLB 파일이 없어 OBJ 파일 사용: ${data.length} chars');
+          await rootBundle.loadString(objPath);
+          // GLB 파일이 없어 OBJ 파일 사용
           setState(() {
             errorMessage = 'GLB 파일이 필요합니다. OBJ → GLB 변환을 실행하세요.';
             isLoading = false;
           });
         } catch (objError) {
-          print('❌ OBJ 파일도 로드 실패: $objError');
+          // OBJ 파일도 로드 실패
           setState(() {
             errorMessage = '3D 모델 파일을 찾을 수 없습니다: ${widget.postureNumber}번자세';
             isLoading = false;
@@ -79,7 +89,7 @@ class _PostureModelViewerState extends State<PostureModelViewer> {
         }
       }
     } catch (e) {
-      print('❌ 모델 로드 오류: $e');
+      // 모델 로드 오류
       setState(() {
         errorMessage = '모델 로드 실패: $e';
         isLoading = false;
@@ -99,10 +109,7 @@ class _PostureModelViewerState extends State<PostureModelViewer> {
       child: const Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(
-            color: Color(0xFF6366F1),
-            strokeWidth: 3,
-          ),
+          CircularProgressIndicator(color: Color(0xFF6366F1), strokeWidth: 3),
           SizedBox(height: 16),
           Text(
             '3D 모델 로드 중...',
@@ -129,11 +136,7 @@ class _PostureModelViewerState extends State<PostureModelViewer> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Icon(
-            Icons.error_outline,
-            color: Color(0xFFEF4444),
-            size: 48,
-          ),
+          const Icon(Icons.error_outline, color: Color(0xFFEF4444), size: 48),
           const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -179,48 +182,44 @@ class _PostureModelViewerState extends State<PostureModelViewer> {
       return _buildErrorWidget(errorMessage!);
     }
 
-    return Container(
+    return SizedBox(
       width: widget.width,
       height: widget.height,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(11),
-        child: ModelViewer(
-          backgroundColor: Color(int.parse(widget.backgroundColor!.replaceFirst('#', '0xFF'))),
-          src: 'assets/$modelPath', // GLB 파일 사용
-          alt: '${widget.postureNumber}번 포스처 3D 모델',
-          ar: false,
-          autoRotate: false,
-          cameraControls: widget.enableInteraction,
-          disableZoom: !widget.enableInteraction,
-          disablePan: !widget.enableInteraction,
-          disableTap: !widget.enableInteraction,
-          interactionPrompt: InteractionPrompt.none,
-          loading: Loading.eager,
-          // 카메라 설정 - 인체 모델에 최적화
-          cameraOrbit: '0deg 75deg 2.5m',
-          minCameraOrbit: 'auto auto 1.5m',
-          maxCameraOrbit: 'auto auto 4m',
-          fieldOfView: '45deg',
-          // 조명 설정 - 인체 모델에 적합
-          environmentImage: null, // 기본 환경 조명 사용
-          shadowIntensity: 0.4,
-          shadowSoftness: 0.8,
-          // GLB 최적화 설정
-          poster: null,
-          reveal: Reveal.auto,
-          touchAction: TouchAction.panY,
-        ),
+      child: ModelViewer(
+        key: ValueKey('model_${widget.postureNumber}_$modelPath'),
+        backgroundColor:
+            widget.backgroundColor == 'transparent'
+                ? Colors.transparent
+                : Color(
+                  int.parse(widget.backgroundColor!.replaceFirst('#', '0xFF')),
+                ),
+        src: modelPath!, // GLB 파일 사용 (pubspec.yaml의 postures/ 경로 사용)
+        alt: '${widget.postureNumber}번 포스처 3D 모델',
+        ar: false,
+        autoRotate: widget.enableInteraction,
+        autoRotateDelay: 1000,
+        rotationPerSecond: '60deg',
+        cameraControls: widget.enableInteraction,
+        cameraTarget: 'auto auto auto',
+        disableZoom: !widget.enableInteraction,
+        disablePan: !widget.enableInteraction,
+        disableTap: !widget.enableInteraction,
+        interactionPrompt: InteractionPrompt.none,
+        loading: Loading.eager,
+        // 카메라 설정 - 모델을 매우 작게 보이도록 설정
+        cameraOrbit: '0deg 75deg 80m',
+        minCameraOrbit: 'auto auto 60m',
+        maxCameraOrbit: 'auto auto 100m',
+        fieldOfView: '3deg',
+        // 조명 설정 - 모델이 더 잘 보이도록 개선
+        environmentImage: null, // 기본 환경 조명 사용
+        shadowIntensity: 0.7,
+        shadowSoftness: 0.6,
+        exposure: 1.2,
+        // GLB 최적화 설정
+        poster: null,
+        reveal: Reveal.auto,
+        touchAction: TouchAction.panY,
       ),
     );
   }
@@ -285,7 +284,7 @@ class PostureModelViewerDemo extends StatelessWidget {
                   return ElevatedButton(
                     onPressed: () {
                       // 포스처 변경 로직 구현 예정
-                      print('포스처 $index 선택');
+                      // 포스처 선택
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF6366F1),

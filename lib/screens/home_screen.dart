@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:soft_electronics/screens/measurement_screen_fixed.dart';
 import '../screens/weekly_report_screen.dart';
-import '../screens/posture_image_test_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -66,7 +65,7 @@ class HomeScreen extends StatelessWidget {
                       Column(
                         children: [
                           Text(
-                            'Smart Posture',
+                            '척추요정',
                             style: TextStyle(
                               color: const Color(0xFF2D3748),
                               fontSize: 32,
@@ -76,7 +75,7 @@ class HomeScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            '자세 교정을 위한 스마트 솔루션',
+                            '🧚‍♀️ 당신의 자세를 지켜주는 요정',
                             style: TextStyle(
                               color: const Color(0xFF718096),
                               fontSize: 16,
@@ -91,132 +90,116 @@ class HomeScreen extends StatelessWidget {
                 ),
 
                 Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _buildMenuButton(
-                        context,
-                        title: '🚀 실시간 자세 측정',
-                        subtitle: 'HC-06 센서로 정확한 측정',
-                        icon: Icons.sensors,
-                        gradient: [
-                          const Color(0xFF4A90E2),
-                          const Color(0xFF357ABD),
-                        ],
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) => const MeasurementScreenFixed(),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 20),
-                      _buildMenuButton(
-                        context,
-                        title: '📊 주간 리포트',
-                        subtitle: '자세 통계 및 개선 분석',
-                        icon: Icons.analytics,
-                        gradient: [
-                          const Color(0xFF48BB78),
-                          const Color(0xFF38A169),
-                        ],
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const WeeklyReportScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 20),
-                      _buildMenuButton(
-                        context,
-                        title: '📸 포스처 이미지 뷰어',
-                        subtitle: '직관적인 아이콘으로 자세 확인',
-                        icon: Icons.photo_camera,
-                        gradient: [
-                          const Color(0xFF8B5CF6),
-                          const Color(0xFF7C3AED),
-                        ],
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder:
-                                  (context) => const PostureImageTestScreen(),
-                            ),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 32),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: 20),
+                        _buildMenuButton(
+                          context,
+                          title: '🚀 실시간 자세 측정',
+                          subtitle: 'HC-06 센서로 정확한 측정',
+                          icon: Icons.sensors,
+                          gradient: [
+                            const Color(0xFF4A90E2),
+                            const Color(0xFF357ABD),
+                          ],
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => const MeasurementScreenFixed(),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        _buildMenuButton(
+                          context,
+                          title: '📊 주간 리포트',
+                          subtitle: '자세 통계 및 개선 분석',
+                          icon: Icons.analytics,
+                          gradient: [
+                            const Color(0xFF48BB78),
+                            const Color(0xFF38A169),
+                          ],
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => const WeeklyReportScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 24),
 
-                      // 추가 정보 카드
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: const Color(0xFF4A90E2).withOpacity(0.1),
-                            width: 1,
+                        // 추가 정보 카드
+                        Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: const Color(0xFF4A90E2).withOpacity(0.1),
+                              width: 1,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
-                              blurRadius: 10,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF4A90E2).withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(12),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: const Color(
+                                    0xFF4A90E2,
+                                  ).withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Icon(
+                                  Icons.info_outline,
+                                  color: const Color(0xFF4A90E2),
+                                  size: 24,
+                                ),
                               ),
-                              child: Icon(
-                                Icons.info_outline,
-                                color: const Color(0xFF4A90E2),
-                                size: 24,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '💡 사용 팁',
-                                    style: TextStyle(
-                                      color: const Color(0xFF2D3748),
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '💡 사용 팁',
+                                      style: TextStyle(
+                                        color: const Color(0xFF2D3748),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'HC-06 센서를 목 뒤에 부착하고 측정하세요',
-                                    style: TextStyle(
-                                      color: const Color(0xFF718096),
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'HC-06 센서를 목 뒤에 부착하고 측정하세요',
+                                      style: TextStyle(
+                                        color: const Color(0xFF718096),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ],

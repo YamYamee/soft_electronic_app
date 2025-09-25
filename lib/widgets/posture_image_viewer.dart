@@ -18,7 +18,7 @@ class PostureImageViewer extends StatefulWidget {
   State<PostureImageViewer> createState() => _PostureImageViewerState();
 }
 
-class _PostureImageViewerState extends State<PostureImageViewer> 
+class _PostureImageViewerState extends State<PostureImageViewer>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
@@ -66,13 +66,9 @@ class _PostureImageViewerState extends State<PostureImageViewer>
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 1.1,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -83,8 +79,9 @@ class _PostureImageViewerState extends State<PostureImageViewer>
 
   @override
   Widget build(BuildContext context) {
-    final colors = postureColors[widget.postureIndex] ?? 
-                   [const Color(0xFF4CAF50), const Color(0xFF45A049)];
+    final colors =
+        postureColors[widget.postureIndex] ??
+        [const Color(0xFF4CAF50), const Color(0xFF45A049)];
     final postureName = postureNames[widget.postureIndex] ?? '알 수 없음';
     final icon = postureIcons[widget.postureIndex] ?? Icons.help;
 
@@ -110,10 +107,7 @@ class _PostureImageViewerState extends State<PostureImageViewer>
                     colors[1].withOpacity(0.05),
                   ],
                 ),
-                border: Border.all(
-                  color: colors[0].withOpacity(0.3),
-                  width: 2,
-                ),
+                border: Border.all(color: colors[0].withOpacity(0.3), width: 2),
                 boxShadow: [
                   BoxShadow(
                     color: colors[0].withOpacity(0.2),
@@ -127,7 +121,10 @@ class _PostureImageViewerState extends State<PostureImageViewer>
                 children: [
                   // 상단 포스처 번호
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(colors: colors),
                       borderRadius: BorderRadius.circular(20),
@@ -158,11 +155,7 @@ class _PostureImageViewerState extends State<PostureImageViewer>
                         ),
                       ],
                     ),
-                    child: Icon(
-                      icon,
-                      size: 60,
-                      color: Colors.white,
-                    ),
+                    child: Icon(icon, size: 60, color: Colors.white),
                   ),
                   const SizedBox(height: 20),
 
@@ -187,19 +180,24 @@ class _PostureImageViewerState extends State<PostureImageViewer>
 
                   // 자세 평가
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
-                      color: widget.postureIndex == 0 
-                          ? Colors.green.withOpacity(0.1)
-                          : Colors.red.withOpacity(0.1),
+                      color:
+                          widget.postureIndex == 0
+                              ? Colors.green.withOpacity(0.1)
+                              : Colors.red.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       widget.postureIndex == 0 ? '양호' : '교정 필요',
                       style: TextStyle(
-                        color: widget.postureIndex == 0 
-                            ? Colors.green[700]
-                            : Colors.red[700],
+                        color:
+                            widget.postureIndex == 0
+                                ? Colors.green[700]
+                                : Colors.red[700],
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),

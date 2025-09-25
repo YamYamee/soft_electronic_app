@@ -96,7 +96,7 @@ class _PostureImageTestScreenState extends State<PostureImageTestScreen> {
                     ],
                   ),
                 ),
-                
+
                 const SizedBox(height: 24),
 
                 // 포스처 선택 그리드
@@ -128,12 +128,13 @@ class _PostureImageTestScreenState extends State<PostureImageTestScreen> {
                         const SizedBox(height: 16),
                         Expanded(
                           child: GridView.builder(
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 4,
-                              crossAxisSpacing: 12,
-                              mainAxisSpacing: 12,
-                              childAspectRatio: 0.8,
-                            ),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 4,
+                                  crossAxisSpacing: 12,
+                                  mainAxisSpacing: 12,
+                                  childAspectRatio: 0.8,
+                                ),
                             itemCount: 8,
                             itemBuilder: (context, index) {
                               final isSelected = index == selectedPostureIndex;
@@ -147,9 +148,10 @@ class _PostureImageTestScreenState extends State<PostureImageTestScreen> {
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(16),
                                     border: Border.all(
-                                      color: isSelected
-                                          ? const Color(0xFF4A90E2)
-                                          : Colors.transparent,
+                                      color:
+                                          isSelected
+                                              ? const Color(0xFF4A90E2)
+                                              : Colors.transparent,
                                       width: 3,
                                     ),
                                   ),
@@ -233,14 +235,16 @@ class _PostureImageTestScreenState extends State<PostureImageTestScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: selectedPostureIndex == 0
-            ? Colors.green.withOpacity(0.1)
-            : Colors.orange.withOpacity(0.1),
+        color:
+            selectedPostureIndex == 0
+                ? Colors.green.withOpacity(0.1)
+                : Colors.orange.withOpacity(0.1),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: selectedPostureIndex == 0
-              ? Colors.green.withOpacity(0.3)
-              : Colors.orange.withOpacity(0.3),
+          color:
+              selectedPostureIndex == 0
+                  ? Colors.green.withOpacity(0.3)
+                  : Colors.orange.withOpacity(0.3),
           width: 1,
         ),
       ),
@@ -251,9 +255,10 @@ class _PostureImageTestScreenState extends State<PostureImageTestScreen> {
             children: [
               Icon(
                 selectedPostureIndex == 0 ? Icons.check_circle : Icons.warning,
-                color: selectedPostureIndex == 0
-                    ? Colors.green[600]
-                    : Colors.orange[600],
+                color:
+                    selectedPostureIndex == 0
+                        ? Colors.green[600]
+                        : Colors.orange[600],
                 size: 20,
               ),
               const SizedBox(width: 8),
@@ -262,9 +267,10 @@ class _PostureImageTestScreenState extends State<PostureImageTestScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: selectedPostureIndex == 0
-                      ? Colors.green[700]
-                      : Colors.orange[700],
+                  color:
+                      selectedPostureIndex == 0
+                          ? Colors.green[700]
+                          : Colors.orange[700],
                 ),
               ),
             ],
@@ -272,10 +278,7 @@ class _PostureImageTestScreenState extends State<PostureImageTestScreen> {
           const SizedBox(height: 8),
           Text(
             postureAdvices[selectedPostureIndex] ?? '자세를 확인해보세요.',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[700],
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey[700]),
           ),
         ],
       ),
@@ -327,32 +330,35 @@ class _PostureImageTestScreenState extends State<PostureImageTestScreen> {
   void _showPostureGuide() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
-          '📋 자세 가이드',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildGuideItem('0번: 정상 자세', '머리, 목, 등이 일직선', Colors.green),
-            _buildGuideItem('1번: 목 앞으로', '거북목 증상', Colors.orange),
-            _buildGuideItem('2번: 목 뒤로', '목이 뒤로 젖혀짐', Colors.red),
-            _buildGuideItem('3-4번: 목 좌우', '목이 한쪽으로 기울어짐', Colors.purple),
-            _buildGuideItem('5번: 어깨 굽음', '어깨가 앞으로 굽어짐', Colors.orange),
-            _buildGuideItem('6번: 등 구부림', '등이 둥글게 굽어짐', Colors.red),
-            _buildGuideItem('7번: 전체 구부림', '전신 자세 불량', Colors.red),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('확인'),
+      builder:
+          (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            title: const Text(
+              '📋 자세 가이드',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildGuideItem('0번: 정상 자세', '머리, 목, 등이 일직선', Colors.green),
+                _buildGuideItem('1번: 목 앞으로', '거북목 증상', Colors.orange),
+                _buildGuideItem('2번: 목 뒤로', '목이 뒤로 젖혀짐', Colors.red),
+                _buildGuideItem('3-4번: 목 좌우', '목이 한쪽으로 기울어짐', Colors.purple),
+                _buildGuideItem('5번: 어깨 굽음', '어깨가 앞으로 굽어짐', Colors.orange),
+                _buildGuideItem('6번: 등 구부림', '등이 둥글게 굽어짐', Colors.red),
+                _buildGuideItem('7번: 전체 구부림', '전신 자세 불량', Colors.red),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('확인'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -364,10 +370,7 @@ class _PostureImageTestScreenState extends State<PostureImageTestScreen> {
           Container(
             width: 12,
             height: 12,
-            decoration: BoxDecoration(
-              color: color,
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -383,10 +386,7 @@ class _PostureImageTestScreenState extends State<PostureImageTestScreen> {
                 ),
                 Text(
                   description,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                 ),
               ],
             ),

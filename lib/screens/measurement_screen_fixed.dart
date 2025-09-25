@@ -4,7 +4,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'dart:async';
 import 'dart:convert';
-import '../widgets/posture_image_viewer.dart';
+import '../widgets/posture_model_viewer.dart';
 import 'posture_test_screen.dart';
 
 // 자세 이름 매핑 (전역 상수)
@@ -257,15 +257,17 @@ class _MeasurementScreenFixedState extends State<MeasurementScreenFixed>
             BluetoothDevice device = result.device;
             String deviceId = device.remoteId.str;
 
+            // 이름이 없는 장치는 스캔 결과에서 제외
+            if (device.platformName.isEmpty) {
+              continue;
+            }
+
             // 중복 제거
             if (!deviceIds.contains(deviceId)) {
               deviceIds.add(deviceId);
               uniqueDevices.add(device);
 
-              String deviceName =
-                  device.platformName.isNotEmpty
-                      ? device.platformName
-                      : '이름 없음';
+              String deviceName = device.platformName;
               print('발견된 장치: $deviceName ($deviceId) - RSSI: ${result.rssi}');
             }
           }
@@ -711,12 +713,6 @@ class _MeasurementScreenFixedState extends State<MeasurementScreenFixed>
     _cleanupOldPairs();
   }
 
-  void _addToBuffer(Map<String, dynamic> pair) {
-    _windowData.add(pair);
-    if (_windowData.length > 3) _windowData.removeAt(0);
-    print('� 윈도우 버퍼에 추가됨 - 현재 ${_windowData.length}개');
-  }
-
   void _cleanupOldPairs() {
     int currentTime = DateTime.now().millisecondsSinceEpoch;
     _timestampPairs.removeWhere((timestamp, pair) {
@@ -740,10 +736,23 @@ class _MeasurementScreenFixedState extends State<MeasurementScreenFixed>
       return;
     }
 
-    // IMU 데이터 처리 (relative pitch)
-    double relativePitch = 0.0;
-    if (imuValue is List && imuValue.isNotEmpty) {
-      relativePitch = (imuValue[0] as num).toDouble();
+    // IMU 데이터 처리 (6개 센서 값: ax, ay, az, gx, gy, gz)
+    Map<String, double> imuData = {
+      'ax': 0.0,
+      'ay': 0.0,
+      'az': 0.0,
+      'gx': 0.0,
+      'gy': 0.0,
+      'gz': 0.0,
+    };
+
+    if (imuValue is List && imuValue.length >= 6) {
+      imuData['ax'] = (imuValue[0] as num).toDouble(); // 가속도 X
+      imuData['ay'] = (imuValue[1] as num).toDouble(); // 가속도 Y
+      imuData['az'] = (imuValue[2] as num).toDouble(); // 가속도 Z
+      imuData['gx'] = (imuValue[3] as num).toDouble(); // 자이로 X
+      imuData['gy'] = (imuValue[4] as num).toDouble(); // 자이로 Y
+      imuData['gz'] = (imuValue[5] as num).toDouble(); // 자이로 Z
     }
 
     // FSR 데이터 처리
@@ -757,7 +766,7 @@ class _MeasurementScreenFixedState extends State<MeasurementScreenFixed>
       'device_id':
           '${_imuDevice?.remoteId.str ?? "unknown"}_${_fsrDevice?.remoteId.str ?? "unknown"}',
       'timestamp': DateTime.now().millisecondsSinceEpoch,
-      'IMU': {'relativePitch': relativePitch},
+      'IMU': imuData,
       'FSR': fsrData,
     };
 
@@ -865,8 +874,8 @@ class _MeasurementScreenFixedState extends State<MeasurementScreenFixed>
     }
     print('✅ 캘리브레이션 완료 - 측정 시작');
 
-    // 테스트: 측정 시작 시 진동 명령 강제 전송
-    print('🧪 테스트: 측정 시작과 함께 진동 명령 전송');
+    // 측정 시작 시 진돐 명령 전송
+    print('🧪 테스트: 측정 시작과 함께 진돐 명령 전송');
     _sendVibrationCommand();
   }
 
@@ -1376,9 +1385,8 @@ class _MeasurementScreenFixedState extends State<MeasurementScreenFixed>
 
                       const SizedBox(height: 20),
 
-                      // 진동 테스트 버튼 (IMU 연결 시에만 표시)
-                      if (_imuDevice != null) _buildVibrationTestButton(),
-
+                      // 진동 테스트 버튼 제거됨
+                      // if (_imuDevice != null) _buildVibrationTestButton(),
                       if (_imuDevice != null) const SizedBox(height: 12),
 
                       // 측정 버튼
@@ -2043,53 +2051,77 @@ class _MeasurementScreenFixedState extends State<MeasurementScreenFixed>
                         else ...[
                           // 3D 자세 모델 표시 (자세 번호가 있을 때만)
                           if (_extractPostureNumber() != null) ...[
+                            // 부드러운 원형 배경으로 모델 강조
                             Container(
-                              width: 120,
-                              height: 120,
+                              width: 130,
+                              height: 130,
                               decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(16),
+                                shape: BoxShape.circle,
+                                gradient: RadialGradient(
+                                  center: Alignment.center,
+                                  radius: 0.8,
+                                  colors: [
+                                    Colors.white.withOpacity(0.9),
+                                    Colors.white.withOpacity(0.4),
+                                    Colors.transparent,
+                                  ],
+                                  stops: [0.0, 0.7, 1.0],
+                                ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: currentColor.withOpacity(0.2),
-                                    blurRadius: 8,
-                                    offset: const Offset(0, 4),
+                                    color: currentColor.withOpacity(0.15),
+                                    blurRadius: 20,
+                                    offset: const Offset(0, 8),
                                   ),
                                 ],
                               ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(16),
-                                child: PostureImageViewer(
-                                  postureIndex: _extractPostureNumber()!,
+                              child: Center(
+                                child: PostureModelViewer(
+                                  key: ValueKey(
+                                    'measure_${_extractPostureNumber()}',
+                                  ),
+                                  postureNumber: _extractPostureNumber()!,
                                   width: 120,
-                                  height: 150,
-                                  showLabel: false,
+                                  height: 120,
+                                  enableInteraction: true,
+                                  backgroundColor: 'transparent',
                                 ),
                               ),
                             ),
                             const SizedBox(height: 12),
+                          ] else ...[
+                            // 자세 번호가 없을 때 아이콘 표시
+                            Icon(
+                              Icons.accessibility_new,
+                              color: currentColor,
+                              size: 48,
+                            ),
+                            const SizedBox(height: 16),
                           ],
 
                           // 자세 텍스트 표시
                           Container(
+                            width: double.infinity,
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
+                              horizontal: 12,
                               vertical: 8,
                             ),
+                            margin: const EdgeInsets.symmetric(horizontal: 16),
                             decoration: BoxDecoration(
                               color: currentColor.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
                               _currentPosture,
                               style: TextStyle(
                                 color: currentColor,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: -0.5,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: -0.2,
+                                height: 1.3,
                               ),
                               textAlign: TextAlign.center,
-                              maxLines: 2,
+                              maxLines: 3,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -2223,76 +2255,7 @@ class _MeasurementScreenFixedState extends State<MeasurementScreenFixed>
     );
   }
 
-  Widget _buildVibrationTestButton() {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFFE53E3E).withOpacity(0.2),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () async {
-            print('🧪 진동 테스트 버튼 클릭됨');
-
-            // 사용자에게 진동 테스트 시작 알림
-            if (mounted) {
-              setState(() {
-                _currentPosture = '🧪 진동 테스트 중...';
-              });
-            }
-
-            await _sendVibrationCommand();
-
-            // 테스트 완료 후 메시지 복구
-            await Future.delayed(Duration(seconds: 2));
-            if (mounted && !_isMeasuring) {
-              setState(() {
-                _currentPosture = '진동 테스트 완료 - 연결 상태 확인';
-              });
-            }
-          },
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            decoration: BoxDecoration(
-              color: const Color(0xFFE53E3E),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Icon(Icons.vibration, color: Colors.white, size: 18),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  '🧪 진동 테스트',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  // 진동 테스트 버튼 함수 제거됨
 
   Widget _buildMeasurementButton(Color currentColor) {
     bool canStartMeasurement =
